@@ -18,6 +18,8 @@ set(SOURCES
     src/main.cpp
     src/calculator/Tokenizer.cpp
     src/calculator/ShuntingYard.cpp
+    src/calculator/Evaluator.cpp
+    src/plugins/PluginLoader.cpp
 )
 add_executable(calc ${SOURCES})
 
