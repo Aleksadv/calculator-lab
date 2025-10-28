@@ -22,7 +22,7 @@ set(SOURCES
 add_executable(calc ${SOURCES})
 
 
-target_include_directories(calc PRIVATE include)
+target_include_directories(calc PRIVATE include src)
 
 if(WIN32)
     set_target_properties(calc PROPERTIES SUFFIX ".exe")
