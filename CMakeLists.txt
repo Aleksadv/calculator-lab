@@ -16,7 +16,7 @@ endif()
 
 set(SOURCES
     src/main.cpp
-    
+    src/calculator/Tokenizer.cpp
 )
 add_executable(calc ${SOURCES})
 
