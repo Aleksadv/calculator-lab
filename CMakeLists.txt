@@ -27,6 +27,7 @@ add_executable(calc ${SOURCES})
 target_include_directories(calc PRIVATE include src)
 
 add_subdirectory(plugins_src/funcsin)
+add_subdirectory(plugins_src/funcdeg)
 
 if(WIN32)
     set_target_properties(calc PROPERTIES SUFFIX ".exe")
