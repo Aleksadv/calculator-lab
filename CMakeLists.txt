@@ -17,6 +17,7 @@ endif()
 set(SOURCES
     src/main.cpp
     src/calculator/Tokenizer.cpp
+    src/calculator/ShuntingYard.cpp
 )
 add_executable(calc ${SOURCES})
 
