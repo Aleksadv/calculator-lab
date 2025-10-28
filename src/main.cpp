@@ -7,7 +7,7 @@
 int main(){
     try{
         PluginLoader loader;
-        loader.loadAll("./plugins");
+        loader.loadAll("../plugins");
         for (auto& e : loader.errors()){
             std::cerr << "[plugin warning] " << e << "\n";
         }
