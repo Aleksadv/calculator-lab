@@ -7,7 +7,7 @@ static double applyOp(const std::string& op, double a, double b){
     if (op=="-") return a-b;
     if (op=="*") return a*b;
     if (op=="/"){ if (b==0.0) throw std::runtime_error("Division by zero"); return a/b; }
-    if (op=="^") return std::pow(a,b);
+    //if (op=="^") return std::pow(a,b);  //поддержка ^ будет через dll
     throw std::runtime_error("Unknown operator: " + op);
 }
 
@@ -17,7 +17,8 @@ double Evaluator::evalRPN(const std::vector<RPNItem>& rpn, const FuncRegistry& r
         if (it.kind == RPNItem::PushNumber){
             st.push_back(it.number);
         } else { // ApplyOp
-            if (it.ident=="+"||it.ident=="-"||it.ident=="*"||it.ident=="/"||it.ident=="^"){
+            //if (it.ident=="+"||it.ident=="-"||it.ident=="*"||it.ident=="/"||it.ident=="^"){
+            if (it.ident=="+"||it.ident=="-"||it.ident=="*"||it.ident=="/"){
                 if (st.size()<2) throw std::runtime_error("Stack underflow (operator)");
                 double b=st.back(); st.pop_back();
                 double a=st.back(); st.pop_back();
