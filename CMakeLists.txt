@@ -34,14 +34,15 @@ if(WIN32)
     set_target_properties(calc PROPERTIES SUFFIX ".exe")
 endif()
 
+
 add_executable(calc_selftests
-    tests/calc_selftest.cpp
-    src/calculator/Tokenizer.cpp
-    src/calculator/ShuntingYard.cpp
-    src/calculator/Evaluator.cpp
-    src/plugins/PluginLoader.cpp
+tests/calc_selftest.cpp
+src/calculator/Tokenizer.cpp
+src/calculator/ShuntingYard.cpp
+src/calculator/Evaluator.cpp
+src/plugins/PluginLoader.cpp
 )
+
 target_include_directories(calc_selftests PRIVATE include src)
 
-# На интеграционных тестах хотим, чтобы плагины были собраны
-add_dependencies(calc_selftests funcdeg funcln funcsin) # доб. сюда остальные плагины, если есть
+add_dependencies(calc_selftests funcdeg funcln funcsin) 

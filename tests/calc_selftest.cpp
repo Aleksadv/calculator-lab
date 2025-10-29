@@ -15,6 +15,24 @@
 
 namespace fs = std::filesystem;
 
+struct TeeBuf : public std::streambuf {
+    std::streambuf* a;
+    std::streambuf* b;
+    TeeBuf(std::streambuf* a_, std::streambuf* b_) : a(a_), b(b_) {}
+protected:
+    int overflow(int c) override {
+        if (c == EOF) return !EOF;
+        int const r1 = a->sputc(c);
+        int const r2 = b->sputc(c);
+        return (r1 == EOF || r2 == EOF) ? EOF : c;
+    }
+    std::streamsize xsputn(const char* s, std::streamsize n) override {
+        auto r1 = a->sputn(s, n);
+        auto r2 = b->sputn(s, n);
+        return (r1 < n || r2 < n) ? std::min(r1, r2) : n;
+    }
+};
+
 // --- Вспомогательное: выполнить выражение через ядро с данным реестром ---
 static double Eval(const std::string& expr, const FuncRegistry& reg) {
     auto rpn = ShuntingYard::toRPN(expr);
@@ -87,7 +105,7 @@ static void run_integration_tests(TestStats& S) {
         }
     };
 
-    // Если плагины реально есть — эти тесты пройдут; если нет — получим "Function not found", что тоже ОК для демонстрации.
+    // Если плагины реально есть — эти тесты пройдут; если нет — получим "Function not found".
     try {
         double v = Eval("2^4 + sin(90)", reg); // sin может быть не собран — тогда тоже ошибка
         ST_ASSERT_EQ_DBL(S, v, 17.0, 1e-12, "plugins: 2^4 + sin(90)");
@@ -98,8 +116,6 @@ static void run_integration_tests(TestStats& S) {
     // ln(-100) должен бросить исключение из плагина, если ln подключён
     try {
         (void)Eval("ln(-100)", reg);
-        // если не упало — либо плагина нет, либо баг — в обоих случаях считаем fail только тогда,
-        // когда плагин действительно есть
         bool has_ln = loader.functions().count("ln")>0;
         ST_ASSERT_TRUE(S, !has_ln, "plugins: ln(-100) should throw when ln present");
     } catch (...) {
@@ -143,10 +159,36 @@ static void run_loader_edge_tests(TestStats& S) {
     try { fs::remove_all(badDir); } catch(...) {}
 }
 
-int main() {
+int main(int argc, char** argv) {
+    namespace fs = std::filesystem;
+
+
+    //fs::path projectRoot = fs::path(PROJECT_SOURCE_DI);
+    //fs::path projectRoot = fs::path(PROJECT_SOURCE_DIR);
+    fs::path projectRoot = fs::current_path();
+    if (projectRoot.filename() == "build") {
+    projectRoot = projectRoot.parent_path();
+    }
+    // Папка для отчёта: <repo_root>/tests
+    fs::path testsDir = projectRoot / "tests";
+    fs::create_directories(testsDir);
+
+    fs::path reportPath = testsDir / "selftests_report.txt";
+    std::ofstream report(reportPath, std::ios::out | std::ios::trunc);
+
+    std::streambuf* cout_old = std::cout.rdbuf();
+    TeeBuf tee(cout_old, report.rdbuf());
+    std::cout.rdbuf(&tee);
+
     TestStats stats;
     run_unit_tests(stats);
     run_integration_tests(stats);
     run_loader_edge_tests(stats);
-    return finish(stats);
+    int code = finish(stats);
+
+    std::cout.rdbuf(cout_old);
+    std::cout << "Report saved to: " << reportPath.string() << "\n";
+    report.close();
+    return code;
 }
+

@@ -1,0 +1,20 @@
+== UNIT TESTS (core without real DLLs) ==
+[PASS] basic arith -> 24
+[PASS] precedence -> 7.5
+[PASS] unary minus 1 -> 7
+[PASS] unary minus 2 -> -1
+[PASS] power 2^4 -> 16
+[PASS] power right-assoc -> 512
+[PASS] sin 90deg -> 1
+[PASS] ln domain error bubbles (thrown)
+[PASS] division by zero (thrown)
+
+== INTEGRATION TESTS (real DLLs under ./plugins) ==
+[PASS] plugins: expression raised (acceptable if plugins missing)
+[PASS] plugins: ln(-100) threw (ok)
+
+== LOADER EDGE TESTS ==
+[PASS] empty plugins dir -> 'No DLLs found' warning
+[PASS] bad dll -> 'Failed to LoadLibrary' warning
+
+==== SUMMARY: 13 passed, 0 failed ====
